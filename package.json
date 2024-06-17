@@ -1,0 +1,25 @@
+{
+  "name": "mmm",
+  "version": "1.0.0",
+  "description": "The Minecraft Mod Manager",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arthurfary/minecraft-mod-manager.git"
+  },
+  "keywords": [
+    "minecraft"
+  ],
+  "author": "arthurfary",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/arthurfary/minecraft-mod-manager/issues"
+  },
+  "homepage": "https://github.com/arthurfary/minecraft-mod-manager#readme",
+  "dependencies": {
+    "commander": "^12.1.0"
+  }
+}
