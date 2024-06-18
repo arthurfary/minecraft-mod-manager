@@ -1,11 +1,25 @@
 const { Command } = require("commander");
+const { searchMod } = require("./modSearch");
 
 const program = new Command();
 
 program
-  .option("-s, --search", "Searches for a mod.")
-  .option("-mv, --minecraft-version <version>");
+  .name('mod-finder')
+  .description('CLI to search and download Minecraft mods')
+  .version('1.0.0')
+  .requiredOption('-s, --search <modName>', 'Searches for a mod.')
+  .requiredOption('-mv, --minecraft-version <version>', 'Specifies the Minecraft version.')
+  .option('--fabric', 'Specifies the Fabric loader.')
+  .option('--forge', 'Specifies the Forge loader.')
+  .option('-v, --verbose', 'Verbose mode.');
 
 program.parse(process.argv);
 
 const options = program.opts();
+
+if (options.fabric && options.forge) {
+  console.error("Please specify only one loader: --fabric or --forge.");
+  process.exit(1);
+}
+
+searchMod(options.search, options.minecraftVersion, options.fabric, options.forge, options.verbose);
