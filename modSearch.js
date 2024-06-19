@@ -24,6 +24,7 @@ async function searchMod(modName, minecraftVersion, isFabric, isForge, isVerbose
       return;
     }
 
+    // sort by downloads
     // mods.sort((a, b) => b.downloads - a.downloads);
 
     console.log(`Found ${mods.length} mods for "${modName}" on Minecraft version "${minecraftVersion}":`);
