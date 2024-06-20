@@ -1,6 +1,6 @@
 const axios = require("axios");
 const prompt = require("prompt-sync")();
-const { getDownloadLink } = require("./utils");
+const { getDownloadLink, handleDownload } = require("./utils");
 
 function displayModsOptions(pageMods, pageIndex) {
   console.clear();
@@ -25,14 +25,22 @@ function isValidChoice(choice, modsLength) {
 async function handleChoice(choice, pageMods, version) {
   const selectedMod = pageMods[parseInt(choice) - 1];
   if (selectedMod) {
-    // console.log(`   Project ID: ${selectedMod.project_id}`);
-    // console.log(`   Downloads: ${selectedMod.downloads}`);
-    // console.log(`   Categories: ${selectedMod.categories.join(", ")}`);
-    // console.log(`   Versions: ${selectedMod.versions.join(", ")}`);
-    // console.log(`   URL: ${selectedMod.url}`);
+    console.log(`   Project Title: ${selectedMod.title}`);
+    console.log(`   Project ID: ${selectedMod.project_id}`);
+    console.log(`   Downloads: ${selectedMod.downloads}`);
+    console.log(`   Categories: ${selectedMod.categories.join(", ")}`);
+    console.log(`   Versions: ${selectedMod.versions.join(", ")}`);
 
-    const downloadLink = await getDownloadLink(selectedMod.project_id, version);
-    console.log(`   Download Link: ${downloadLink}`);
+    const shouldDownload = prompt("Download this mod? (Y/n): ");
+    // if is empty or Y
+    if (!shouldDownload || shouldDownload.toLowerCase() == "y") {
+      const downloadLink = await getDownloadLink(
+        selectedMod.project_id,
+        version
+      );
+      console.log("Downloading " + selectedMod.title);
+      handleDownload(downloadLink);
+    }
   } else {
     console.log("Invalid choice. Please try again.");
   }

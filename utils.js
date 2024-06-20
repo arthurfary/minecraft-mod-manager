@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { exec } = require("child_process");
 
 async function getDownloadLink(projectId, minecraftVersion) {
   try {
@@ -33,4 +34,7 @@ async function getDownloadLink(projectId, minecraftVersion) {
   }
 }
 
-module.exports = { getDownloadLink };
+function handleDownload(url) {
+  exec(`curl -O ${url}`);
+}
+module.exports = { getDownloadLink, handleDownload };
