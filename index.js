@@ -26,14 +26,6 @@ if (options.fabric && options.forge) {
   process.exit(1);
 }
 
-// displayMods(
-//   options.search,
-//   options.minecraftVersion,
-//   options.fabric,
-//   options.forge,
-//   options.verbose
-// );
-
 async function modSearchLoop() {
   const mods = await fetchMods(
     options.search,
