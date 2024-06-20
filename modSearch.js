@@ -2,17 +2,17 @@ const axios = require("axios");
 const prompt = require("prompt-sync")();
 const { getDownloadLink, handleDownload } = require("./utils");
 
-function displayModsOptions(pageMods, pageIndex) {
+function displayModsOptions(mods) {
   console.clear();
-  pageMods.forEach((mod, index) => {
-    console.log(`${index + 1 + pageIndex}. ${mod.title} - ${mod.description}`);
+  mods.forEach((mod, index) => {
+    console.log(`${index + 1}. ${mod.title} - ${mod.description}`);
   });
   console.log("---");
 }
 
 function getUserChoice() {
   const answer = prompt(
-    "Choose a mod to download (1-10), load more mods (m), or abort (a): "
+    "Choose a mod to download (1-10), or abort (a): "
   );
   return answer.trim();
 }
@@ -46,33 +46,18 @@ async function handleChoice(choice, pageMods, version) {
   }
 }
 
+
 async function displayMods(mods, version) {
-  // pagination for output
-  let pageIndex = 0;
-  const pageSize = 3;
+  displayModsOptions(mods);
 
-  // mainloop
-  while (true) {
-    const pageMods = mods.slice(pageIndex, pageIndex + pageSize);
-    displayModsOptions(pageMods, pageIndex);
+  const choice = getUserChoice();
 
-    const choice = getUserChoice();
-
-    if (choice === "m") {
-      pageIndex += pageSize;
-      if (pageIndex >= mods.length) {
-        console.log("No more mods to display.");
-        break;
-      }
-    } else if (choice === "a") {
-      console.log("Aborted by user.");
-      break;
-    } else if (isValidChoice(choice, mods.length)) {
-      await handleChoice(choice, mods, version);
-      break;
-    } else {
-      console.log("Invalid choice. Please try again.");
-    }
+  if (choice === "a") {
+    console.log("Aborted by user.");
+  } else if (isValidChoice(choice, mods.length)) {
+    await handleChoice(choice, mods, version);
+  } else {
+    console.log("Invalid choice. Please try again.");
   }
 }
 
