@@ -1,7 +1,8 @@
-const { Command } = require("commander");
-const { displayMods } = require("./modSearch");
-const { fetchMods } = require("./fetchMods");
+#!/usr/bin/env node
 
+import { Command } from "commander";
+import displayMods from "./modSearch.js";
+import fetchMods from "./fetchMods.js";
 const program = new Command();
 
 program

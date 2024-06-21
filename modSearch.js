@@ -1,5 +1,5 @@
-const prompt = require("prompt-sync")();
-const { getDownloadLink, handleDownload } = require("./utils");
+import inquirer from "inquirer";
+import utils from "./utils.js";
 
 function displayModsOptions(mods) {
   console.clear();
@@ -22,24 +22,40 @@ async function handleChoice(choice, mods, version) {
   console.log(`   Categories: ${selectedMod.categories.join(", ")}`);
   console.log(`   Versions: ${selectedMod.versions.join(", ")}`);
 
-  const shouldDownload = prompt("Download this mod? (Y/n): ");
-  // if is empty or Y
-  if (!shouldDownload || shouldDownload.toLowerCase() == "y") {
-    const downloadLink = await getDownloadLink(
+  // const shouldDownload = prompt("Download this mod? (Y/n): ");
+  const prompt = await inquirer.prompt({
+    name: "should_download",
+    type: "input",
+    message: "Download this mod? (Y/n)",
+    default() {
+      return "Y";
+    },
+    validate(input) {
+      // Ensures that input is either 'Y', 'y', 'N', or 'n'
+      return ['Y', 'y', 'N', 'n'].includes(input) ? true : 'Please enter Y or N';
+    }
+  });
+
+  const shouldDownload = prompt.should_download.toLowerCase() === "y";
+
+  if (shouldDownload) {
+    const downloadLink = await utils.getDownloadLink(
       selectedMod.project_id,
       version
     );
     console.log("Downloading " + selectedMod.title);
-    handleDownload(downloadLink);
+    utils.handleDownload(downloadLink);
   }
 }
 
 async function displayMods(mods, version) {
   displayModsOptions(mods);
-
-  const choice = prompt(
-    "Choose a mod to download (1-10), or abort (a): "
-  ).trim();
+  const prompt = await inquirer.prompt({
+    name: "choice",
+    type: "input",
+    message: "Choose a mod to download (1-10), or abort (a)",
+  });
+  const choice = prompt.choice;
 
   // check for early abort
   if (choice.toLowerCase() == 'a') {
@@ -54,4 +70,4 @@ async function displayMods(mods, version) {
   }
 }
 
-module.exports = { displayMods };
+export default displayMods;

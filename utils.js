@@ -1,5 +1,5 @@
-const axios = require("axios");
-const { exec } = require("child_process");
+import axios from "axios";
+import { exec } from "child_process";
 
 async function getDownloadLink(projectId, minecraftVersion) {
   try {
@@ -37,4 +37,10 @@ async function getDownloadLink(projectId, minecraftVersion) {
 function handleDownload(url) {
   exec(`curl -O ${url}`);
 }
-module.exports = { getDownloadLink, handleDownload };
+
+const utils = {
+  handleDownload,
+  getDownloadLink
+}
+
+export default utils

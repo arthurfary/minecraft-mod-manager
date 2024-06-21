@@ -1,4 +1,4 @@
-const { default: axios } = require("axios");
+import axios from "axios";
 
 async function fetchMods(modName, minecraftVersion, isFabric, isForge) {
   let facets = `[["versions:${minecraftVersion}"]]`;
@@ -19,4 +19,4 @@ async function fetchMods(modName, minecraftVersion, isFabric, isForge) {
   return response.data.hits.length ? response.data.hits : nu;
 }
 
-module.exports = { fetchMods };
+export default fetchMods;
