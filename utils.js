@@ -1,5 +1,6 @@
 import axios from "axios";
 import { exec } from "child_process";
+import fs from "fs";
 
 async function getDownloadLink(projectId, minecraftVersion) {
   try {
@@ -35,12 +36,32 @@ async function getDownloadLink(projectId, minecraftVersion) {
 }
 
 function handleDownload(url) {
-  exec(`curl -O ${url}`);
+  return new Promise((resolve) => {
+    let downloadCommand;
+
+    if (process.cwd().endsWith("mods")) {
+      downloadCommand = `curl -O ${url}`;
+    } else {
+      if (!fs.existsSync("./mods")) {
+        fs.mkdirSync("./mods");
+      }
+      downloadCommand = `cd mods && curl -O ${url}`;
+    }
+
+    exec(downloadCommand, (error) => {
+      if (error) {
+        console.error("Download error:", error);
+        resolve(false);
+      } else {
+        resolve(true);
+      }
+    });
+  });
 }
 
 const utils = {
   handleDownload,
-  getDownloadLink
-}
+  getDownloadLink,
+};
 
-export default utils
+export default utils;
