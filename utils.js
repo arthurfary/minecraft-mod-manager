@@ -35,16 +35,24 @@ async function getDownloadLink(projectId, minecraftVersion) {
   }
 }
 
+function isInModsDir() {
+  return process.cwd().endsWith("mods");
+}
+
+function createModsDirIfNecessary() {
+  if (!fs.existsSync("./mods")) {
+    fs.mkdirSync("./mods");
+  }
+}
+
 function handleDownload(url) {
   return new Promise((resolve) => {
     let downloadCommand;
 
-    if (process.cwd().endsWith("mods")) {
+    if (isInModsDir()) {
       downloadCommand = `curl -O ${url}`;
     } else {
-      if (!fs.existsSync("./mods")) {
-        fs.mkdirSync("./mods");
-      }
+      createModsDirIfNecessary();
       downloadCommand = `cd mods && curl -O ${url}`;
     }
 
@@ -62,6 +70,8 @@ function handleDownload(url) {
 const utils = {
   handleDownload,
   getDownloadLink,
+  isInModsDir,
+  createModsDirIfNecessary,
 };
 
 export default utils;

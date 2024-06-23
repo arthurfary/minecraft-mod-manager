@@ -1,33 +1,63 @@
 #!/usr/bin/env node
 
-import { Command } from "commander";
-import displayMods from "./modSearch.js";
+import { Command, Option } from "commander";
 import fetchMods from "./fetchMods.js";
+import modInteraction from "./modInteraction.js";
+import jsonHandler from "./jsonHandler.js";
+
 const program = new Command();
 
 program
   .name("mod-finder")
   .description("CLI to search and download Minecraft mods")
   .version("1.0.0")
-  .requiredOption("-s, --search <modName>", "Searches for a mod.")
-  .requiredOption(
-    "-mv, --minecraft-version <version>",
-    "Specifies the Minecraft version."
+  .addOption(
+    new Option("-s, --search <modName>", "Searches for a mod.").conflicts([
+      "list",
+      "remove",
+    ])
   )
-  .option("--fabric", "Specifies the Fabric loader.")
-  .option("--forge", "Specifies the Forge loader.")
-  .option("-v, --verbose", "Verbose mode.");
+  .addOption(
+    new Option(
+      "-mv, --minecraft-version <version>",
+      "Specifies the Minecraft version."
+    ).conflicts(["list", "remove"])
+  )
+  .addOption(
+    new Option("--fabric", "Specifies the Fabric loader.").conflicts("forge")
+  )
+  .addOption(new Option("--forge", "Specifies the Forge loader."))
+  .addOption(
+    new Option("-l, --list", "List all mods currently downloaded.").conflicts([
+      "remove",
+      "forge",
+      "fabric",
+    ])
+  )
+  .addOption(
+    new Option("-r, --remove", "Remove and delete a downloaded mod.").conflicts(
+      ["forge", "fabric"]
+    )
+  );
 
 program.parse(process.argv);
 
 const options = program.opts();
+// console.log(options);
 
-if (options.fabric && options.forge) {
-  console.error("Please specify only one loader: --fabric or --forge.");
+if (options.search) searchAndDownloadMod();
+else if (options.list) listInstalledMods();
+else if (options.remove) removeMod();
+else if ((options.fabric || options.forge) && !options.search) {
+  console.log("--fabric and --forge require the use of --search");
   process.exit(1);
-}
+} else program.help();
 
-async function modSearchLoop() {
+async function searchAndDownloadMod() {
+  if (options.fabric && options.forge) {
+    console.error("Please specify only one loader: --fabric or --forge.");
+    process.exit(1);
+  }
   const mods = await fetchMods(
     options.search,
     options.minecraftVersion,
@@ -42,8 +72,12 @@ async function modSearchLoop() {
   }
   // if there is mods
   else {
-    displayMods(mods, options.minecraftVersion);
+    modInteraction(mods, options.minecraftVersion);
   }
 }
 
-modSearchLoop();
+function listInstalledMods() {
+  for (const modName of jsonHandler.getInstalledMods()) {
+    console.log(modName);
+  }
+}

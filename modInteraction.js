@@ -1,6 +1,7 @@
 import inquirer from "inquirer";
 import utils from "./utils.js";
 import { createSpinner } from "nanospinner";
+import jsonHandler from "./jsonHandler.js";
 
 async function displayModsOptions(mods) {
   const choices = mods.map((mod, index) => ({
@@ -54,7 +55,6 @@ async function handleChoice(choice, mods, version) {
   }
 }
 
-// migrate the get downlaod link to the handle download function
 async function downloadMod(mod, version) {
   try {
     const downloadLink = await utils.getDownloadLink(mod.project_id, version);
@@ -65,6 +65,9 @@ async function downloadMod(mod, version) {
 
     if (downloadSuccess) {
       spinner.success({ text: `${mod.title} downloaded!` });
+
+      // save to json
+      jsonHandler.saveToJson(mod, version, downloadLink);
     } else {
       spinner.error({
         text: `An error occurred when downloading ${mod.title}`,
@@ -75,7 +78,7 @@ async function downloadMod(mod, version) {
   }
 }
 
-async function displayMods(mods, version) {
+async function modInteraction(mods, version) {
   const choice = await displayModsOptions(mods);
 
   // check for early abort
@@ -91,4 +94,4 @@ async function displayMods(mods, version) {
   }
 }
 
-export default displayMods;
+export default modInteraction;
