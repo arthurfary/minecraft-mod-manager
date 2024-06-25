@@ -10,7 +10,7 @@ import utils from "./utils.js";
 const program = new Command();
 
 program
-  .name("mod-finder")
+  .name("Minecraft Mod Manager")
   .description("CLI to search and download Minecraft mods")
   .version("1.0.0")
   .addOption(
@@ -49,7 +49,6 @@ program
   );
 
 program.parse(process.argv);
-
 const options = program.opts();
 // console.log(options);
 
