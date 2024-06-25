@@ -1,60 +1,71 @@
 import utils from "./utils.js";
 import fs from "fs";
 
-function writeToJsonFile(path, data) {
+// NEED TO ADD INFO IN JSON FIRST TIME RUNNING
+
+const path = "./mods/mods.json";
+
+function writeToJsonFile(data) {
   const jsonData = JSON.stringify(data, null, 2); // Convert data to JSON string
   fs.writeFileSync(path, jsonData); // Write JSON string to file
 }
 
-function readJsonFile(path) {
+function readJsonFile() {
   try {
     const data = fs.readFileSync(path, "utf-8"); // Read file synchronously
-    return data; // Return the file content
+    return JSON.parse(data); // Parse and return JSON data
   } catch (err) {
     throw err;
   }
 }
-
-// REFACTOR
-function saveToJson(mod, version, download_link) {
+function saveToJson(mod) {
   if (!utils.isInModsDir()) {
-    const path = "./mods/mods.json";
-    let data = readJsonFile(path);
+    const data = readJsonFile();
 
-    data = JSON.parse(data); // Parse the JSON data
-
-    if (!data[version]) {
-      data[version] = {}; // Ensure version key exists
+    if (!data.mods) {
+      data.mods = {}; // Ensure 'mods' key exists
     }
 
-    data[version][mod.title] = {
-      download_link: download_link,
+    data.mods[mod.title] = {
+      download_link: mod.download_link,
       project_id: mod.project_id,
       categories: [...mod.categories],
-    }; // Modify the data
+    };
 
-    writeToJsonFile(path, data); // Write the updated data back to the file
-  } else {
-    createJsonFile("./");
+    writeToJsonFile(data);
   }
 }
 
 function getInstalledMods() {
-  const modList = JSON.parse(readJsonFile("./mods/mods.json"));
-
-  const modNames = [];
-
-  for (let version in modList) {
-    for (let modName in modList[version]) {
-      modNames.push(modName);
-    }
-  }
-  return modNames;
+  const modList = readJsonFile();
+  return Object.keys(modList.mods || {});
 }
 
+function getDownloadLinkByModName(name) {
+  const data = readJsonFile();
+  const mod = data.mods && data.mods[name];
+  return mod ? mod.download_link : null;
+}
+
+function getFilenameFromDownloadLink(link) {
+  return link.split("/").pop();
+}
+
+function removeModFromJson(modName) {
+  if (!utils.isInModsDir()) {
+    const data = readJsonFile();
+    if (data.mods && data.mods[modName]) {
+      delete data.mods[modName];
+      writeToJsonFile(data);
+    }
+  }
+}
 const jsonHandler = {
   saveToJson,
   getInstalledMods,
+  getDownloadLinkByModName,
+  getFilenameFromDownloadLink,
+  removeModFromJson,
 };
 
 export default jsonHandler;

@@ -67,11 +67,19 @@ function handleDownload(url) {
   });
 }
 
+function deleteModFile(file) {
+  const path = isInModsDir() ? file : "mods/" + file;
+  fs.rm(path, (err) => {
+    if (err) throw new Error("Error deliting file: " + err);
+  });
+}
+
 const utils = {
   handleDownload,
   getDownloadLink,
   isInModsDir,
   createModsDirIfNecessary,
+  deleteModFile,
 };
 
 export default utils;
