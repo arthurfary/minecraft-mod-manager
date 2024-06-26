@@ -1,13 +1,7 @@
-# TODO
+# Minecraft Mod Manager
 
-### Minor
+This project build a cli to handle Minecraft mods, it aims to aid in the creation of
+modpacks by using the Modrinth API to download mods easily.
 
-- [x] Migrate c logs to inquirer
-
-### Major
-
-- [ ] Add saving functionality, to toml or json.
-  > should be able to save the mods into a file
-  > this file then could be saved and shared to install wherever
-  > file should contain name id and download link, add something like
-  > `-i` to install from file
+All mod download links are saved in a Json file so they can be easily downloaded later,
+in a friend's computer for example!
