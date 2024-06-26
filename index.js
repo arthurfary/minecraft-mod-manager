@@ -105,5 +105,5 @@ async function selectAndRemoveMod() {
 }
 
 function installFromFile() {
-  "Body";
+  jsonHandler.installAllModsInFile();
 }

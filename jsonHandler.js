@@ -18,7 +18,8 @@ function readJsonFile() {
     throw err;
   }
 }
-function saveToJson(mod) {
+
+function saveToJson(mod, version, download_link) {
   if (!utils.isInModsDir()) {
     const data = readJsonFile();
 
@@ -29,6 +30,8 @@ function saveToJson(mod) {
     data.mods[mod.title] = {
       download_link: mod.download_link,
       project_id: mod.project_id,
+      version: version,
+      download_link: download_link,
       categories: [...mod.categories],
     };
 
@@ -60,12 +63,21 @@ function removeModFromJson(modName) {
     }
   }
 }
+
+function installAllModsInFile() {
+  const mods = readJsonFile().mods;
+  for (let mod in mods) {
+    utils.handleDownload(mods[mod].download_link);
+  }
+}
+
 const jsonHandler = {
   saveToJson,
   getInstalledMods,
   getDownloadLinkByModName,
   getFilenameFromDownloadLink,
   removeModFromJson,
+  installAllModsInFile
 };
 
 export default jsonHandler;
