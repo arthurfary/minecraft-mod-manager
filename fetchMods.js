@@ -16,7 +16,7 @@ async function fetchMods(modName, minecraftVersion, isFabric, isForge) {
     },
   });
 
-  return response.data.hits.length ? response.data.hits : nu;
+  return response.data.hits.length ? response.data.hits : null;
 }
 
 export default fetchMods;

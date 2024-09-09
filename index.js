@@ -37,7 +37,7 @@ program
     ])
   )
   .addOption(
-    new Option("-r, --remove", "Remove and delete a downloaded mod.").conflicts(
+    new Option("-r, --remove [modName]", "Remove and delete a downloaded mod.").conflicts(
       ["forge", "fabric"]
     )
   )
@@ -54,7 +54,7 @@ const options = program.opts();
 
 if (options.search) searchAndDownloadMod();
 else if (options.list) listInstalledMods();
-else if (options.remove) selectAndRemoveMod();
+else if (options.remove) removeMod();
 else if ((options.fabric || options.forge) && !options.search) {
   console.log("--fabric and --forge require the use of --search");
   process.exit(1);
@@ -90,18 +90,29 @@ function listInstalledMods() {
   }
 }
 
-async function selectAndRemoveMod() {
-  const selectedMod = await selector(
-    jsonHandler.getInstalledMods(),
-    "Select a mod to be removed."
-  );
+
+async function removeMod() {
+  let selectedMod = options.remove; // Use the mod name passed with --remove
+  const installedMods = jsonHandler.getInstalledMods();
+
+  if (!installedMods.includes(selectedMod)) {
+    console.log("Mod not found or invalid selection.");
+    return;
+  }
+
+  // If no mod name is provided, or if the provided mod is not in the installed mods, prompt for selection
+  if (!selectedMod) {
+    selectedMod = await selector(installedMods, "Select a mod to be removed.");
+  }
 
   const modFile = jsonHandler.getFilenameFromDownloadLink(
     jsonHandler.getDownloadLinkByModName(selectedMod)
   );
 
+  // Proceed to remove the mod
   utils.deleteModFile(modFile);
   jsonHandler.removeModFromJson(selectedMod);
+  console.log(`Mod "${selectedMod}" has been removed.`);
 }
 
 function installFromFile() {
