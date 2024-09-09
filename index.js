@@ -50,22 +50,29 @@ program
 
 program.parse(process.argv);
 const options = program.opts();
-// console.log(options);
 
-if (options.search) searchAndDownloadMod();
-else if (options.list) listInstalledMods();
-else if (options.remove) removeMod();
-else if ((options.fabric || options.forge) && !options.search) {
-  console.log("--fabric and --forge require the use of --search");
-  process.exit(1);
-} else if (options.install) installFromFile();
-else program.help();
+handleOptions(options);
 
-async function searchAndDownloadMod() {
+function handleOptions(options) {
+  if (options.search) return searchAndDownloadMod(options);
+  if (options.list) return listInstalledMods();
+  if (options.remove) return removeMod(options);
+  if (options.install) return installFromFile();
+
+  if (options.fabric || options.forge) {
+    console.log("--fabric and --forge require the use of --search");
+    process.exit(1);
+  }
+
+  program.help();
+}
+
+async function searchAndDownloadMod(options) {
   if (options.fabric && options.forge) {
     console.error("Please specify only one loader: --fabric or --forge.");
     process.exit(1);
   }
+
   const mods = await fetchMods(
     options.search,
     options.minecraftVersion,
@@ -75,41 +82,35 @@ async function searchAndDownloadMod() {
   );
 
   if (!mods) {
-    console.log("No mods found");
+    console.log("No mods found.");
     return;
   }
-  // if there is mods
-  else {
-    modInteraction(mods, options.minecraftVersion);
-  }
+
+  modInteraction(mods, options.minecraftVersion);
 }
 
 function listInstalledMods() {
-  for (const modName of jsonHandler.getInstalledMods()) {
-    console.log(modName);
-  }
+  const installedMods = jsonHandler.getInstalledMods();
+  installedMods.forEach((modName) => console.log(modName));
 }
 
-
-async function removeMod() {
-  let selectedMod = options.remove; // Use the mod name passed with --remove
+async function removeMod(options) {
   const installedMods = jsonHandler.getInstalledMods();
+  let selectedMod = options.remove;
+
+  if (!selectedMod || !installedMods.includes(selectedMod)) {
+    selectedMod = await selector(installedMods, "Select a mod to be removed.");
+  }
 
   if (!installedMods.includes(selectedMod)) {
     console.log("Mod not found or invalid selection.");
     return;
   }
 
-  // If no mod name is provided, or if the provided mod is not in the installed mods, prompt for selection
-  if (!selectedMod) {
-    selectedMod = await selector(installedMods, "Select a mod to be removed.");
-  }
-
   const modFile = jsonHandler.getFilenameFromDownloadLink(
     jsonHandler.getDownloadLinkByModName(selectedMod)
   );
 
-  // Proceed to remove the mod
   utils.deleteModFile(modFile);
   jsonHandler.removeModFromJson(selectedMod);
   console.log(`Mod "${selectedMod}" has been removed.`);
